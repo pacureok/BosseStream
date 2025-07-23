@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Enlace a tu archivo CSS personalizado -->
     <link rel="stylesheet" href="style.css">
-    <!-- Fuente Inter de Google Fonts -->
-    <link href="https://fonts.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Fuente Inter de Google Fonts (¡URL CORREGIDA!) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-gray-100 font-inter antialiased flex items-center justify-center min-h-screen p-4">
     <div class="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl">
@@ -34,7 +34,8 @@
             <p class="text-gray-700 mb-3">Tu ID de usuario: <span id="user-id-display" class="font-mono text-green-700 break-all"></span></p>
             <p class="text-gray-700 mb-3">
                 <span id="share-link-text">Comparte este enlace para que otros se unan:</span>
-                <a id="share-link" href="#" class="text-blue-600 hover:underline break-all"></a>
+                <!-- Texto inicial para accesibilidad -->
+                <a id="share-link" href="#" class="text-blue-600 hover:underline break-all">Enlace de sala (se generará al iniciar transmisión)</a>
             </p>
             <button id="start-stream-btn"
                     class="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out mb-3">
@@ -76,7 +77,7 @@
     <script type="module">
         // Importa las funciones necesarias de Firebase SDK
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, FieldValue, doc, setDoc, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, FieldValue, doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
         // Si vas a usar Analytics, también lo importas:
         // import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
 
@@ -112,6 +113,7 @@
         window.getDoc = getDoc;
         window.updateDoc = updateDoc;
         window.deleteDoc = deleteDoc;
+        window.getDocs = getDocs; // Asegúrate de exportar getDocs también
     </script>
     <!-- Enlace a tu archivo JavaScript principal -->
     <script src="script.js"></script>
