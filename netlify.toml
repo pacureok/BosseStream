@@ -1,0 +1,40 @@
+# netlify.toml
+
+# Sección de configuración de compilación (build)
+[build]
+  # Directorio donde Netlify encontrará los archivos de tu sitio web para publicar.
+  # Para tu proyecto, que tiene index.html, style.css y script.js en la raíz,
+  # el directorio de publicación es la raíz misma.
+  publish = "/"
+
+  # Comando de compilación. Para tu proyecto simple de HTML/CSS/JS, no necesitas un comando de compilación.
+  # Si tuvieras un framework (como React, Vue, Angular) o un preprocesador (como Sass, Babel),
+  # aquí pondrías el comando para generar los archivos estáticos (ej: "npm run build").
+  command = "" # Deja vacío si no hay un comando de compilación
+
+
+# Sección de configuración para el entorno de desarrollo local (opcional)
+[dev]
+  # Puerto en el que se ejecutará el servidor de desarrollo local de Netlify.
+  # Puedes acceder a tu sitio localmente en http://localhost:8888
+  port = 8888
+  # Directorio base para el servidor de desarrollo.
+  publish = "/"
+  # Comando para iniciar tu servidor de desarrollo local (si tienes uno).
+  # Por ejemplo, si usas un servidor simple de Python: "python -m http.server 8000"
+  command = ""
+
+# Redirecciones (opcional, muy útil para SPA o rutas personalizadas)
+# Ejemplo: redireccionar todas las rutas no encontradas a index.html (útil para SPAs)
+# [[redirects]]
+#   from = "/*"
+#   to = "/index.html"
+#   status = 200
+
+# Encabezados (headers) personalizados (opcional)
+# [[headers]]
+#   for = "/*"
+#   [headers.values]
+#     X-Frame-Options = "DENY"
+#     X-XSS-Protection = "1; mode=block"
+#     Content-Security-Policy = "default-src 'self'; script-src 'self' https://www.gstatic.com https://cdn.tailwindcss.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;"
