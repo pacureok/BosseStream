@@ -1,8 +1,23 @@
 // script.js
 
-// Importa las funciones necesarias de Firebase SDK directamente aquí
+// Importa TODAS las funciones necesarias de Firebase SDK directamente aquí
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, FieldValue, doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    query, 
+    orderBy, 
+    onSnapshot, 
+    serverTimestamp, 
+    FieldValue, // Importa FieldValue directamente
+    doc, 
+    setDoc, 
+    getDoc, 
+    updateDoc, 
+    deleteDoc, 
+    getDocs 
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
 
 // Tu configuración de Firebase (LA MISMA QUE YA TENÍAS)
 const firebaseConfig = {
@@ -64,9 +79,9 @@ const RTC_CONFIG = {
 };
 
 // --- Firebase Firestore References for WebRTC ---
-let roomRef = null;
-let offerCandidatesRef = null;
-let answerCandidatesRef = null;
+let roomDocRef = null; // Renombrado para mayor claridad
+let offerCandidatesCollectionRef = null;
+let answerCandidatesCollectionRef = null;
 
 // Función para copiar texto al portapapeles
 function copyToClipboard(text) {
@@ -146,12 +161,18 @@ async function startWebRTCTransmission() {
             peerConnection.addTrack(track, localStream);
         });
 
+        // Referencias a la sala y subcolecciones de candidatos
+        roomDocRef = doc(db, 'webrtc_rooms', currentRoomId);
+        offerCandidatesCollectionRef = collection(roomDocRef, 'offerCandidates');
+        answerCandidatesCollectionRef = collection(roomDocRef, 'answerCandidates');
+
+
         // Manejar candidatos ICE (para establecer la conexión de red)
         peerConnection.onicecandidate = event => {
             if (event.candidate) {
                 console.log('Broadcaster ICE candidate:', event.candidate);
                 // Enviar el candidato ICE a Firestore
-                addDoc(collection(roomRef, 'offerCandidates'), event.candidate.toJSON());
+                addDoc(offerCandidatesCollectionRef, event.candidate.toJSON());
             }
         };
 
@@ -161,8 +182,7 @@ async function startWebRTCTransmission() {
         console.log('Created and set local offer:', offer);
 
         // Guardar la oferta en Firestore
-        roomRef = doc(db, 'webrtc_rooms', currentRoomId);
-        await setDoc(roomRef, {
+        await setDoc(roomDocRef, {
             offer: {
                 type: offer.type,
                 sdp: offer.sdp
@@ -173,7 +193,7 @@ async function startWebRTCTransmission() {
         audioStatus.textContent = 'Oferta de transmisión creada y esperando oyentes...';
 
         // Escuchar por respuestas (answers) de los oyentes
-        onSnapshot(roomRef, async (snapshot) => {
+        onSnapshot(roomDocRef, async (snapshot) => {
             const data = snapshot.data();
             if (data && data.answer && !peerConnection.currentRemoteDescription) {
                 console.log('Received answer from listener:', data.answer);
@@ -184,8 +204,7 @@ async function startWebRTCTransmission() {
         });
 
         // Escuchar por candidatos ICE de los oyentes
-        answerCandidatesRef = collection(roomRef, 'answerCandidates');
-        onSnapshot(answerCandidatesRef, (snapshot) => {
+        onSnapshot(answerCandidatesCollectionRef, (snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === 'added') {
                     const candidate = new RTCIceCandidate(change.doc.data());
@@ -222,9 +241,9 @@ async function joinWebRTCRoom(roomId) {
     noRemoteAudioMessage.classList.remove('hidden'); // Mostrar mensaje de "esperando audio"
 
     try {
-        roomRef = doc(db, 'webrtc_rooms', currentRoomId);
-        offerCandidatesRef = collection(roomRef, 'offerCandidates');
-        answerCandidatesRef = collection(roomRef, 'answerCandidates');
+        roomDocRef = doc(db, 'webrtc_rooms', currentRoomId);
+        offerCandidatesCollectionRef = collection(roomDocRef, 'offerCandidates');
+        answerCandidatesCollectionRef = collection(roomDocRef, 'answerCandidates');
 
         // 1. Crear RTCPeerConnection
         peerConnection = new RTCPeerConnection(RTC_CONFIG);
@@ -235,7 +254,7 @@ async function joinWebRTCRoom(roomId) {
             if (event.candidate) {
                 console.log('Listener ICE candidate:', event.candidate);
                 // Enviar el candidato ICE a Firestore
-                addDoc(collection(roomRef, 'answerCandidates'), event.candidate.toJSON());
+                addDoc(answerCandidatesCollectionRef, event.candidate.toJSON());
             }
         };
 
@@ -262,7 +281,7 @@ async function joinWebRTCRoom(roomId) {
         };
 
         // Escuchar por la oferta del transmisor
-        onSnapshot(roomRef, async (snapshot) => {
+        onSnapshot(roomDocRef, async (snapshot) => {
             const data = snapshot.data();
             if (data && data.offer && !peerConnection.currentRemoteDescription) {
                 console.log('Received offer from broadcaster:', data.offer);
@@ -276,7 +295,7 @@ async function joinWebRTCRoom(roomId) {
                 console.log('Created and set local answer:', answer);
 
                 // Guardar la respuesta en Firestore
-                await updateDoc(roomRef, {
+                await updateDoc(roomDocRef, {
                     answer: {
                         type: answer.type,
                         sdp: answer.sdp
@@ -287,7 +306,7 @@ async function joinWebRTCRoom(roomId) {
         });
 
         // Escuchar por candidatos ICE del transmisor
-        onSnapshot(offerCandidatesRef, (snapshot) => {
+        onSnapshot(offerCandidatesCollectionRef, (snapshot) => {
             snapshot.docChanges().forEach(async (change) => {
                 if (change.type === 'added') {
                     const candidate = new RTCIceCandidate(change.doc.data());
@@ -334,18 +353,18 @@ async function stopWebRTCTransmission() {
     // Limpiar datos de la sala en Firestore si era el transmisor
     if (isBroadcaster && currentRoomId) {
         try {
-            const roomDocRef = doc(db, 'webrtc_rooms', currentRoomId);
-            const offerCandidatesCollectionRef = collection(roomDocRef, 'offerCandidates');
-            const answerCandidatesCollectionRef = collection(roomDocRef, 'answerCandidates');
+            const roomDocRefToDelete = doc(db, 'webrtc_rooms', currentRoomId); // Usar un nombre diferente para evitar conflicto
+            const offerCandidatesSubCollectionRef = collection(roomDocRefToDelete, 'offerCandidates');
+            const answerCandidatesSubCollectionRef = collection(roomDocRefToDelete, 'answerCandidates');
 
             // Eliminar candidatos
-            const offerCandidatesSnapshot = await getDocs(offerCandidatesCollectionRef);
+            const offerCandidatesSnapshot = await getDocs(offerCandidatesSubCollectionRef);
             offerCandidatesSnapshot.forEach(d => deleteDoc(d.ref));
-            const answerCandidatesSnapshot = await getDocs(answerCandidatesCollectionRef);
+            const answerCandidatesSnapshot = await getDocs(answerCandidatesSubCollectionRef);
             answerCandidatesSnapshot.forEach(d => deleteDoc(d.ref));
 
             // Eliminar el documento de la sala
-            await deleteDoc(roomDocRef);
+            await deleteDoc(roomDocRefToDelete);
             console.log('Room data cleaned up from Firestore.');
         } catch (e) {
             console.error('Error cleaning up room data:', e);
@@ -382,7 +401,7 @@ const messagesRef = collection(db, "chatMessages");
 const q = query(messagesRef, orderBy("timestamp", "asc"));
 onSnapshot(q, (snapshot) => {
     chatMessages.innerHTML = ''; // Limpiar mensajes existentes
-    snapshot.forEach((doc) => {
+    snapshot.forEach((doc) => { // 'doc' aquí es una variable local del forEach, no la función global
         const message = doc.data();
         const isOwnMessage = message.userId === userId;
         const messageClass = isOwnMessage ? 'own' : 'other';
