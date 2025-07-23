@@ -1,0 +1,93 @@
+/* style.css */
+
+/* Estilos personalizados para la fuente Inter */
+.font-inter {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Estilos básicos del cuerpo para centrar y fondo */
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f3f4f6; /* gray-100 de Tailwind */
+    padding: 1rem; /* p-4 de Tailwind */
+}
+
+/* Estilo del contenedor principal */
+.container {
+    background-color: #ffffff; /* bg-white de Tailwind */
+    border-radius: 0.75rem; /* rounded-xl de Tailwind */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg de Tailwind */
+    padding: 1.5rem; /* p-6 de Tailwind */
+    width: 100%;
+    max-width: 48rem; /* max-w-2xl de Tailwind (aprox. 768px) */
+}
+
+/* Estilo específico para el contenedor de mensajes del chat */
+#chat-messages {
+    scroll-behavior: smooth; /* Desplazamiento suave para nuevos mensajes */
+}
+
+/* Estilo para mensajes de chat individuales */
+.chat-message {
+    margin-bottom: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    line-height: 1.4;
+}
+
+.chat-message.own {
+    background-color: #e0f2fe; /* blue-100 de Tailwind */
+    text-align: right;
+    margin-left: auto; /* Empuja los mensajes propios a la derecha */
+    max-width: 90%; /* Limita el ancho */
+    word-wrap: break-word; /* Rompe palabras largas */
+}
+
+.chat-message.other {
+    background-color: #f3e8ff; /* purple-100 de Tailwind */
+    text-align: left;
+    margin-right: auto; /* Mantiene los otros mensajes a la izquierda */
+    max-width: 90%; /* Limita el ancho */
+    word-wrap: break-word; /* Rompe palabras largas */
+}
+
+.chat-message .username {
+    font-weight: 600; /* font-semibold de Tailwind */
+    color: #4c1d95; /* purple-800 de Tailwind */
+    margin-bottom: 0.25rem;
+    display: block; /* Asegura que el nombre de usuario esté en su propia línea */
+}
+
+.chat-message .message-text {
+    color: #374151; /* gray-700 de Tailwind */
+}
+
+/* Ocultar la barra de desplazamiento para una apariencia más limpia, pero mantener la funcionalidad */
+#chat-messages::-webkit-scrollbar {
+    width: 8px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background-color: #cbd5e0; /* gray-300 de Tailwind */
+    border-radius: 4px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background-color: #f7fafc; /* gray-50 de Tailwind */
+}
+
+/* Ajustes responsivos */
+@media (max-width: 640px) {
+    .container {
+        padding: 1rem;
+    }
+    h1 {
+        font-size: 2rem; /* Ajusta el tamaño del encabezado para pantallas más pequeñas */
+    }
+    h2 {
+        font-size: 1.5rem;
+    }
+}
