@@ -13,6 +13,9 @@ body {
     min-height: 100vh;
     background-color: #f3f4f6; /* gray-100 de Tailwind */
     padding: 1rem; /* p-4 de Tailwind */
+    /* Corrección de compatibilidad para text-size-adjust */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
 }
 
 /* Estilo del contenedor principal */
