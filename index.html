@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Transmisión de Audio</title>
+  />
+</head>
+<body>
+  <div id="access">
+    <h2>Ingresa el código de acceso</h2>
+    <input type="text" id="accessCode" placeholder="Código de acceso" />
+    <button onclick="checkAccess()">Entrar</button>
+  </div>
+
+  <div id="mainApp" style="display:none;">
+    <h1>Transmisión de Audio</h1>
+    <button onclick="startStreaming()">Iniciar Transmisión</button>
+    <div id="chat">
+      <h2>Chat en Vivo</h2>
+      <div id="messages"></div>
+      <input type="text" id="chatInput" placeholder="Escribe un mensaje..." />
+      <button onclick="sendMessage()">Enviar</button>
+    </div>
+  </div>
+
+  <script src="stream.js"></script>
+  <script src="chat.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
