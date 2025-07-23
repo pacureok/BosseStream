@@ -1,19 +1,23 @@
 // script.js
 
-// Accede a las instancias y funciones de Firebase exportadas globalmente desde index.html
-const db = window.db;
-const collection = window.collection;
-const addDoc = window.addDoc;
-const query = window.query;
-const orderBy = window.orderBy;
-const onSnapshot = window.onSnapshot;
-const serverTimestamp = window.serverTimestamp;
-const FieldValue = window.FieldValue;
-const doc = window.doc;
-const setDoc = window.setDoc;
-const getDoc = window.getDoc;
-const updateDoc = window.updateDoc;
-const deleteDoc = window.deleteDoc;
+// Importa las funciones necesarias de Firebase SDK directamente aquí
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, FieldValue, doc, setDoc, getDoc, updateDoc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+// Tu configuración de Firebase (LA MISMA QUE YA TENÍAS)
+const firebaseConfig = {
+    apiKey: "AIzaSyAu7MWQjdQmKSU-0_WEpu0rw4ld4mhwexY",
+    authDomain: "bosse-22145.firebaseapp.com",
+    projectId: "bosse-22145",
+    storageBucket: "bosse-22145.firebasestorage.app",
+    messagingSenderId: "164787042932",
+    appId: "1:164787042932:web:be30af7b6576f8f0eeaf21",
+    measurementId: "G-R7BZBHWP90"
+};
+
+// Inicializa Firebase directamente en este script
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 // Elementos del DOM
 const privateAccessSection = document.getElementById('private-access-section');
@@ -147,12 +151,9 @@ async function startWebRTCTransmission() {
             if (event.candidate) {
                 console.log('Broadcaster ICE candidate:', event.candidate);
                 // Enviar el candidato ICE a Firestore
-                addDoc(offerCandidatesRef, event.candidate.toJSON());
+                addDoc(collection(roomRef, 'offerCandidates'), event.candidate.toJSON());
             }
         };
-
-        // Escuchar por pistas de audio remotas (no aplica para el transmisor en este modelo simple)
-        // peerConnection.ontrack = event => { ... };
 
         // 3. Crear Oferta (Offer)
         const offer = await peerConnection.createOffer();
@@ -234,7 +235,7 @@ async function joinWebRTCRoom(roomId) {
             if (event.candidate) {
                 console.log('Listener ICE candidate:', event.candidate);
                 // Enviar el candidato ICE a Firestore
-                addDoc(answerCandidatesRef, event.candidate.toJSON());
+                addDoc(collection(roomRef, 'answerCandidates'), event.candidate.toJSON());
             }
         };
 
