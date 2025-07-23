@@ -2,7 +2,8 @@
 
 // Accede a las instancias de Firebase que se exportaron globalmente desde index.html
 const db = window.db;
-const serverTimestamp = window.serverTimestamp;
+const serverTimestamp = window.serverTimestamp; // Todavía lo exportamos por si acaso, pero usaremos FieldValue
+const FieldValue = window.FieldValue; // Importamos FieldValue
 
 // Elementos del DOM
 const privateAccessSection = document.getElementById('private-access-section');
@@ -129,13 +130,14 @@ stopStreamBtn.addEventListener('click', () => {
 // --- Lógica del Chat en Vivo con Firebase Firestore ---
 
 // Referencia a la colección de mensajes en Firestore
-const messagesRef = firebase.firestore().collection("chatMessages"); // Usamos firebase.firestore() directamente
+const messagesRef = collection(db, "chatMessages"); // Usamos la función collection importada
 
 // Escuchar mensajes en tiempo real
 // Nota: 'orderBy' requiere que configures un índice en Firebase Firestore para 'timestamp'
 // Si ves errores en la consola sobre índices, ve a la consola de Firebase -> Firestore Database -> Índices
 // y crea un índice para la colección 'chatMessages' en el campo 'timestamp' (ascendente).
-messagesRef.orderBy("timestamp", "asc").onSnapshot((snapshot) => {
+const q = query(messagesRef, orderBy("timestamp", "asc"));
+onSnapshot(q, (snapshot) => {
     chatMessages.innerHTML = ''; // Limpiar mensajes existentes
     snapshot.forEach((doc) => {
         const message = doc.data();
@@ -167,11 +169,11 @@ sendChatBtn.addEventListener('click', async () => {
     const messageText = chatInput.value.trim();
     if (messageText) {
         try {
-            await messagesRef.add({
+            await addDoc(messagesRef, { // Usamos la función addDoc importada
                 userId: userId, // Usamos el ID de usuario generado
                 username: `Usuario ${userId.substring(5, 10)}`, // Un nombre de usuario simple para mostrar
                 text: messageText,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp() // Marca de tiempo del servidor para ordenar
+                timestamp: FieldValue.serverTimestamp() // Usamos FieldValue.serverTimestamp()
             });
             chatInput.value = ''; // Limpiar el input
             chatStatus.textContent = 'Mensaje enviado.';
