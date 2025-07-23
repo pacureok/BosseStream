@@ -69,27 +69,34 @@
     <!-- Firebase SDKs -->
     <script type="module">
         // Importa las funciones necesarias de Firebase SDK
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, FieldValue } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+        // Si vas a usar Analytics, también lo importas:
+        // import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
 
-        // *** TU CONFIGURACIÓN DE FIREBASE AQUÍ ***
-        // REEMPLAZA ESTO CON LA CONFIGURACIÓN QUE COPIASTE DE LA CONSOLA DE FIREBASE
+
+        // Tu configuración de Firebase
         const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_AUTH_DOMAIN",
-            projectId: "TU_PROJECT_ID",
-            storageBucket: "TU_STORAGE_BUCKET",
-            messagingSenderId: "TU_MESSAGING_SENDER_ID",
-            appId: "TU_APP_ID"
+            apiKey: "AIzaSyAu7MWQjdQmKSU-0_WEpu0rw4ld4mhwexY",
+            authDomain: "bosse-22145.firebaseapp.com",
+            projectId: "bosse-22145",
+            storageBucket: "bosse-22145.firebasestorage.app",
+            messagingSenderId: "164787042932",
+            appId: "1:164787042932:web:be30af7b6576f8f0eeaf21",
+            measurementId: "G-R7BZBHWP90"
         };
 
         // Inicializa Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        // Si vas a usar Analytics, lo inicializas:
+        // const analytics = getAnalytics(app);
 
         // Exporta db y serverTimestamp para que sean accesibles en script.js
         window.db = db;
+        // Para usar serverTimestamp, necesitas accederlo a través de FieldValue
         window.serverTimestamp = serverTimestamp;
+        window.FieldValue = FieldValue; // Exporta FieldValue para acceso a serverTimestamp
     </script>
     <!-- Enlace a tu archivo JavaScript principal -->
     <script src="script.js"></script>
